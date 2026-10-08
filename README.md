@@ -47,6 +47,8 @@ curl http://localhost:18080/items/1
 `K6_OUT=none`にすると、k6のOpenTelemetry出力を外します。
 
 試験ごとに、k6の要約、終了コード、試験中のコンテナごとのCPU使用率、実際に動いていたコンテナの設定が、`results/runs.jsonl`に1行ずつ追記されます。
+要約の`vus_max`は初期化したVUの数で、反復を実行中のVUの数は`vus`に別に残します。
+`reqs.rate`は、完了したリクエストの数を、終了時の完了待ちを含む実行時間で割った値です。
 
 ## スクリプトと本の章
 
@@ -54,8 +56,8 @@ curl http://localhost:18080/items/1
 | --- | --- | --- |
 | `k6/test.js` | 1回の反復で1件のリクエストを送る試験。`MODEL`で`constant-vus`と`constant-arrival-rate`を切り替える。`CHECK_DROPPED=true`で`dropped_iterations`の閾値を足す | 2章、3章、4章 |
 | `run.sh` | 試験を流し、結果を`results/runs.jsonl`に残す | 全章 |
-| `analyze_traces.py` | 試験の時間範囲のトレースをTempoから取り、スパンごとの時間を集計する。`python3 analyze_traces.py <試験の名前> 300` | 6章、7章、8章 |
-| `replay.py` | `results/runs.jsonl`の1行だけを使って試験をやり直し、判定を比べる。`python3 replay.py <記録した試験の名前> <新しい試験の名前>` | 9章 |
+| `analyze_traces.py` | 試験の時間範囲のトレースをTempoから取り、スパンごとの時間を集計する。`python3 analyze_traces.py --same-set <試験の名前> 300`。`--same-set`を付けると、全部の行を両サービスのスパンがそろったトレース（`inventory`が受け付けたリクエスト）だけで集計する | 6章、7章、8章 |
+| `replay.py` | `results/runs.jsonl`の1行を使って試験をやり直し、判定を比べる。`python3 replay.py <記録した試験の名前> <新しい試験の名前>`。負荷の条件は`args`から、環境変数とCPUの割り当ては`config`から戻す。コードは戻さないので、スクリプトのハッシュ、イメージ、CPUの割り当てが記録と違えば警告する | 9章 |
 | `config/config.alloy` | Alloyの設定 | 5章 |
 | `config/grafana/provisioning/datasources/datasources.yaml` | Grafanaのデータソースと、トレースからログへ移る設定 | 5章 |
 

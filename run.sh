@@ -82,5 +82,11 @@ import json, sys
 label, start, end, cpu, summary, code, args, config = sys.argv[1:]
 rec = {"label": label, "start": start, "end": end, "args": args, "k6_exit": int(code),
        "config": json.loads(config), "cpu_pct": json.loads(cpu), **json.loads(summary or "{}")}
+# vus is the number of VUs running iterations, sampled during the test.
+# vus_max is the number of initialized VUs, which includes idle ones.
+try:
+    rec["vus"] = json.load(open(f"results/{label}.json"))["metrics"]["vus"]["values"]
+except (OSError, KeyError, ValueError):
+    rec["vus"] = None
 print(json.dumps(rec, ensure_ascii=False))
 PY

@@ -1,0 +1,55 @@
+.dockerignore
+  s_9cbfbcbfb549ab::t_959a61ca3a4a51 1-4
+.gitignore
+  s_9cbfbcbfb549ab::t_31bf47302855c0 1
+Dockerfile
+  s_9cbfbcbfb549ab::t_6d9bc33cc1313b 1-11
+README.md
+  s_9cbfbcbfb549ab::t_5c0a4fbaa21f94 1-70
+analyze_traces.py
+  s_9cbfbcbfb549ab::t_935b2ff8fb021b 1-49
+cmd/api/main.go
+  s_9cbfbcbfb549ab::t_eab556a8586610 1-139
+cmd/backend/main.go
+  s_9cbfbcbfb549ab::t_9d3938d0522804 1-114
+compose.yaml
+  s_9cbfbcbfb549ab::t_8d6c3382616b2b 1-87
+config/config.alloy
+  s_9cbfbcbfb549ab::t_e872f33ec1ffb2 1-35
+config/grafana/provisioning/datasources/datasources.yaml
+  s_9cbfbcbfb549ab::t_aa8018ae4beb50 1-40
+config/loki.yaml
+  s_9cbfbcbfb549ab::t_3d98d87bd85658 1-32
+config/mimir.yaml
+  s_9cbfbcbfb549ab::t_d2adabef153f28 1-50
+config/tempo.yaml
+  s_9cbfbcbfb549ab::t_546628eba1eb76 1-21
+go.mod
+  s_9cbfbcbfb549ab::t_ec54c778c83ccd 1-38
+go.sum
+  s_9cbfbcbfb549ab::t_1195f0d0606ddd 1-75
+internal/telemetry/telemetry.go
+  s_9cbfbcbfb549ab::t_bb5ee9c393f9e9 1-112
+k6/test.js
+  s_9cbfbcbfb549ab::t_e29fa06103a304 1-68
+replay.py
+  s_9cbfbcbfb549ab::t_178184d0efcf12 1-41
+run.sh
+  s_9cbfbcbfb549ab::t_df6bd08f6ac8a9 1-86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a054e3bf4ac306a86bc5c2ce65ab78e4b2f7111e",
+  "prompts": {},
+  "sessions": {
+    "s_9cbfbcbfb549ab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f65ddf87-97e8-4c2f-9803-5e752cea6020",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}

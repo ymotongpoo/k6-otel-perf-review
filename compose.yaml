@@ -1,0 +1,87 @@
+name: cndw-perf
+
+x-otel-env: &otel-env
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
+  OTEL_METRIC_EXPORT_INTERVAL: "5000"
+
+services:
+  api:
+    build: { context: ., args: { CMD: api } }
+    environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: catalog-api
+      API_CONCURRENCY: ${API_CONCURRENCY:-4}
+      API_LOCAL_MS: ${API_LOCAL_MS:-5}
+      INSTRUMENT_WAIT: ${INSTRUMENT_WAIT:-false}
+      TELEMETRY_DISABLED: ${TELEMETRY_DISABLED:-false}
+      BACKEND_URL: http://backend:8081
+    ports: ["18080:8080"]
+    cpus: ${API_CPUS:-1}
+    depends_on: [backend, alloy]
+
+  backend:
+    build: { context: ., args: { CMD: backend } }
+    environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: inventory
+      TELEMETRY_DISABLED: ${TELEMETRY_DISABLED:-false}
+      BACKEND_CAPACITY: ${BACKEND_CAPACITY:-6}
+      BACKEND_SERVICE_MS: ${BACKEND_SERVICE_MS:-50}
+      BACKEND_JITTER_MS: ${BACKEND_JITTER_MS:-10}
+      BACKEND_QUEUE: ${BACKEND_QUEUE:-8}
+    cpus: ${BACKEND_CPUS:-1}
+    depends_on: [alloy]
+
+  k6:
+    image: grafana/k6:2.3.0@sha256:9c2dee7f8ed74d317e4027c06a10f169b625638189de8d4555d0b3486a5aeb34
+    profiles: [tools]
+    volumes: ["./k6:/scripts:ro", "./results:/results"]
+    environment:
+      K6_OTEL_EXPORTER_PROTOCOL: http/protobuf
+      K6_OTEL_HTTP_EXPORTER_ENDPOINT: alloy:4318
+      K6_OTEL_HTTP_EXPORTER_INSECURE: "true"
+      K6_OTEL_SERVICE_NAME: k6
+      K6_OTEL_FLUSH_INTERVAL: 5s
+      K6_OTEL_EXPORT_INTERVAL: 5s
+    cpus: ${K6_CPUS:-1}
+    depends_on: [api]
+
+  alloy:
+    image: grafana/alloy:v1.20.1@sha256:2aa2099af76c0098d4af7a4d6e48f86cb66dc1a000222ad927a1c67c6542d13f
+    command: [run, /etc/alloy/config.alloy, --storage.path=/var/lib/alloy/data, --server.http.listen-addr=0.0.0.0:12345]
+    volumes: ["./config/config.alloy:/etc/alloy/config.alloy:ro"]
+    ports: ["12346:12345"]
+    depends_on: [mimir, tempo, loki]
+
+  mimir:
+    image: grafana/mimir:3.2.2@sha256:04068a0a838b6efe9449a04c1d6acd74c7438ac6073dfcbb99c29892647525e3
+    command: [-config.file=/etc/mimir.yaml]
+    volumes: ["./config/mimir.yaml:/etc/mimir.yaml:ro", "mimir-data:/data"]
+    ports: ["19009:9009"]
+
+  tempo:
+    image: grafana/tempo:3.1.0@sha256:3076b8dcdfb32fd6bc5ccef85e7b7313e6199b9cb84366257fc17ecb696db5fd
+    command: [-target=all, -config.file=/etc/tempo.yaml]
+    volumes: ["./config/tempo.yaml:/etc/tempo.yaml:ro", "tempo-data:/var/tempo"]
+    ports: ["13200:3200"]
+
+  loki:
+    image: grafana/loki:3.7.8@sha256:1107dd5274e0ada47e42472b7a7e71f3b2a2fe878878108f3e2f9e51528f0193
+    command: [-config.file=/etc/loki.yaml]
+    volumes: ["./config/loki.yaml:/etc/loki.yaml:ro", "loki-data:/loki"]
+    ports: ["13100:3100"]
+
+  grafana:
+    image: grafana/grafana:13.2.3@sha256:b28bae15e219c998fb0e0424ed724930cc61b1f61fb404d47c862f9a23f9e572
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes: ["./config/grafana/provisioning:/etc/grafana/provisioning:ro"]
+    ports: ["13000:3000"]
+    depends_on: [mimir, tempo, loki]
+
+volumes:
+  mimir-data:
+  tempo-data:
+  loki-data:

@@ -1,0 +1,35 @@
+// Receive OTLP from the applications and from k6, then route each signal to
+// its store: metrics to Mimir, traces to Tempo, logs to Loki.
+otelcol.receiver.otlp "default" {
+  grpc { endpoint = "0.0.0.0:4317" }
+  http { endpoint = "0.0.0.0:4318" }
+
+  output {
+    metrics = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.batch.default.input]
+    logs    = [otelcol.processor.batch.default.input]
+  }
+}
+
+otelcol.processor.batch "default" {
+  output {
+    metrics = [otelcol.exporter.otlphttp.mimir.input]
+    traces  = [otelcol.exporter.otlp.tempo.input]
+    logs    = [otelcol.exporter.otlphttp.loki.input]
+  }
+}
+
+otelcol.exporter.otlphttp "mimir" {
+  client { endpoint = "http://mimir:9009/otlp" }
+}
+
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "tempo:4317"
+    tls { insecure = true }
+  }
+}
+
+otelcol.exporter.otlphttp "loki" {
+  client { endpoint = "http://loki:3100/otlp" }
+}

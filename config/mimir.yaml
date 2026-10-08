@@ -1,0 +1,50 @@
+# Single-process Mimir for the demo. Do not use in production.
+multitenancy_enabled: false
+target: all
+
+server:
+  http_listen_port: 9009
+  log_level: warn
+
+blocks_storage:
+  backend: filesystem
+  bucket_store:
+    sync_dir: /data/tsdb-sync
+  filesystem:
+    dir: /data/blocks
+  tsdb:
+    dir: /data/tsdb
+
+compactor:
+  data_dir: /data/compactor
+  sharding_ring:
+    kvstore: { store: memberlist }
+
+distributor:
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore: { store: memberlist }
+
+ingester:
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore: { store: memberlist }
+    replication_factor: 1
+
+ruler_storage:
+  backend: filesystem
+  filesystem:
+    dir: /data/rules
+
+store_gateway:
+  sharding_ring:
+    replication_factor: 1
+
+limits:
+  max_global_series_per_user: 0
+  ingestion_rate: 100000
+  ingestion_burst_size: 1000000
+  otel_metric_suffixes_enabled: true
+
+usage_stats:
+  enabled: false

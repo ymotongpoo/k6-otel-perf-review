@@ -15,7 +15,7 @@ Zenn本『その修正で本当に速くなったのか？k6とOpenTelemetryで�
 | `k6` | grafana/k6 2.3.0。`docker compose run`で起動する（`tools`プロファイル） |
 | `alloy` | grafana/alloy v1.20.1 |
 | `mimir`、`tempo`、`loki` | grafana/mimir 3.2.2、grafana/tempo 3.1.0、grafana/loki 3.7.8。単一のプロセスで動かし、ローカルのファイルシステムに保存する |
-| `grafana` | grafana/grafana 13.2.3。ホストの13000番。匿名でログインできる |
+| `grafana` | grafana/grafana 13.2.3。ホストの13000番。匿名でログインできる。ダッシュボード「k6-otel-perf-review」に、k6とアプリケーションのメトリクスを並べてある |
 
 処理時間は`time.Sleep`で作っているので、CPUの性能に結果がほとんど左右されません。
 コンテナイメージは`compose.yaml`と`Dockerfile`でダイジェストまで固定しています。
@@ -56,10 +56,11 @@ curl http://localhost:18080/items/1
 | --- | --- | --- |
 | `k6/test.js` | 1回の反復で1件のリクエストを送る試験。`MODEL`で`constant-vus`と`constant-arrival-rate`を切り替える。`CHECK_DROPPED=true`で`dropped_iterations`の閾値を足す | 2章、3章、4章 |
 | `run.sh` | 試験を流し、結果を`results/runs.jsonl`に残す | 全章 |
-| `analyze_traces.py` | 試験の時間範囲のトレースをTempoから取り、スパンごとの時間を集計する。`python3 analyze_traces.py --same-set <試験の名前> 300`。`--same-set`を付けると、全部の行を両サービスのスパンがそろったトレース（`inventory`が受け付けたリクエスト）だけで集計する | 6章、7章、8章 |
+| `analyze_traces.py` | 試験の時間範囲を30に分け、それぞれから同じ件数ずつトレースをTempoから取り、スパンごとの時間を集計する。`python3 analyze_traces.py --same-set <試験の名前> 300`。`--same-set`を付けると、全部の行を両サービスのスパンがそろったトレース（`inventory`が受け付けたリクエスト）だけで集計する | 6章、7章、8章 |
 | `replay.py` | `results/runs.jsonl`の1行を使って試験をやり直し、判定を比べる。`python3 replay.py <記録した試験の名前> <新しい試験の名前>`。負荷の条件は`args`から、環境変数とCPUの割り当ては`config`から戻す。コードは戻さないので、スクリプトのハッシュ、イメージ、CPUの割り当てが記録と違えば警告する | 9章 |
 | `config/config.alloy` | Alloyの設定 | 5章 |
 | `config/grafana/provisioning/datasources/datasources.yaml` | Grafanaのデータソースと、トレースからログへ移る設定 | 5章 |
+| `config/grafana/provisioning/dashboards/` | k6とアプリケーションのメトリクスを並べたダッシュボード。上の「試験」で`testid`を選べる | 5章、6章、8章 |
 
 Tempoは取り込みに時間がかかるので、`analyze_traces.py`は試験が終わってから1分ほど待って実行してください。
 取り込みの途中で検索すると、返るトレースが偏ります。

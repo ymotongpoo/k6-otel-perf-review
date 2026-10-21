@@ -1,6 +1,6 @@
 module github.com/ymotongpoo/k6-otel-perf-review
 
-go 1.26.0
+go 1.27.3
 
 require (
 	go.opentelemetry.io/contrib/bridges/otelslog v0.21.0

@@ -1,0 +1,7 @@
+apiVersion: 1
+
+providers:
+  - name: k6-otel-perf-review
+    type: file
+    options:
+      path: /etc/grafana/provisioning/dashboards/json

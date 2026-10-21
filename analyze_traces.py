@@ -2,6 +2,8 @@
 
 Usage: python3 analyze_traces.py [--same-set] <label> [limit]
 
+The traces are taken evenly from 30 equal slices of the test's time range.
+
 Each row is computed per trace first (for example, server span minus client
 span of the same request) and then summarized as a distribution.
 
@@ -23,9 +25,29 @@ label = argv[0]
 limit = int(argv[1]) if len(argv) > 1 else 300
 run = [json.loads(l) for l in open('results/runs.jsonl') if json.loads(l)['label'] == label][-1]
 ts = lambda s: int(datetime.datetime.fromisoformat(s.replace('Z', '+00:00')).timestamp())
-q = urllib.parse.urlencode({'q': '{resource.service.name="catalog-api" && kind=server}',
-                            'start': ts(run['start']), 'end': ts(run['end']) + 5, 'limit': limit, 'spss': 1})
-traces = json.load(urllib.request.urlopen(f'{TEMPO}/api/search?{q}'))['traces']
+# Tempo returns search results in no particular time order, so a single search
+# with a limit can over-sample one part of the test (for example the start,
+# before the queue has built up). Split the test into equal slices and take the
+# same number of traces from each.
+SLICES = 30
+start, end = ts(run['start']), ts(run['end']) + 1
+per_slice = []
+for i in range(SLICES):
+    s0 = start + (end - start) * i // SLICES
+    s1 = start + (end - start) * (i + 1) // SLICES
+    q = urllib.parse.urlencode({'q': '{resource.service.name="catalog-api" && kind=server}',
+                                'start': s0, 'end': s1, 'limit': 5 * -(-limit // SLICES), 'spss': 1})
+    found = [t for t in json.load(urllib.request.urlopen(f'{TEMPO}/api/search?{q}'))['traces']
+             if s0 * 1e9 <= int(t['startTimeUnixNano']) < s1 * 1e9]
+    per_slice.append(sorted(found, key=lambda t: t['startTimeUnixNano']))
+# Take one trace from each slice in turn until the limit is reached, so that
+# slices with few requests (the end of the test) do not shrink the sample.
+traces, seen, k = [], set(), 0
+while len(traces) < limit and any(len(f) > k for f in per_slice):
+    for f in per_slice:
+        if len(f) > k and len(traces) < limit and f[k]['traceID'] not in seen:
+            seen.add(f[k]['traceID']); traces.append(f[k])
+    k += 1
 expected = min(limit, run.get('iterations', {}).get('count', limit))
 if len(traces) < expected:
     print(f'warning: Tempo returned {len(traces)} traces, expected {expected}. '

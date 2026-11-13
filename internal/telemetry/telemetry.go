@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 // Package telemetry sets up the OpenTelemetry SDK for traces, metrics, and logs.
 // Every signal is exported over OTLP/HTTP. The endpoint and the service name
 // come from the standard OTEL_* environment variables.

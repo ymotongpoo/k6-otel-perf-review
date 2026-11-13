@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
 # Run one k6 test against the demo and append the result to results/runs.jsonl.
 #
 # Usage: ./run.sh <label> [KEY=VALUE ...]

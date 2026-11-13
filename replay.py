@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Re-run a recorded test from results/runs.jsonl and compare the verdicts.
 
 Usage: python3 replay.py <label> <new-label>

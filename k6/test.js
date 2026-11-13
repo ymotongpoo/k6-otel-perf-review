@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 // One iteration sends one GET /items/{id} to catalog-api.
 //
 // MODEL=closed uses constant-vus: each VU waits for the response before it

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Summarize per-request time breakdown from Tempo for one run in runs.jsonl.
 
 Usage: python3 analyze_traces.py [--same-set] <label> [limit]

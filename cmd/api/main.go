@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 // Command api serves GET /items/{id}. Each request does a few milliseconds of
 // local work and then calls backend. At most API_CONCURRENCY calls to backend
 // run at a time; other requests wait for a free slot.

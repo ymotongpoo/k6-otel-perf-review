@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 // Command backend is the downstream service called by api. It processes at
 // most BACKEND_CAPACITY requests at a time, each taking about
 // BACKEND_SERVICE_MS milliseconds. Requests beyond the capacity wait in a

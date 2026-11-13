@@ -1,0 +1,33 @@
+LICENSE
+  s_12533da68c7694::t_c0c96f97e2db1c 1-201
+analyze_traces.py
+  s_12533da68c7694::t_e7ac8873e469dd 1
+cmd/api/main.go
+  s_12533da68c7694::t_2563cb295e3c5b 1-2
+cmd/backend/main.go
+  s_12533da68c7694::t_3a9af36cbc3119 1-2
+internal/telemetry/telemetry.go
+  s_12533da68c7694::t_e0a2efbf06d600 1-2
+k6/test.js
+  s_12533da68c7694::t_a22eb07666556f 1-2
+replay.py
+  s_12533da68c7694::t_24c735d5c2ea0d 1
+run.sh
+  s_12533da68c7694::t_ff4113060eac00 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a01938ffac213397f14a32eeb88987a0d00fcd98",
+  "prompts": {},
+  "sessions": {
+    "s_12533da68c7694": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f02a854f-ad22-4b74-ae36-57d78a42ac21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yoshi Yamaguchi <ymotongpoo@gmail.com>"
+    }
+  }
+}

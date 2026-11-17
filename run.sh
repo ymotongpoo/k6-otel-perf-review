@@ -6,7 +6,7 @@
 #
 # Keys for the applications (API_CONCURRENCY, INSTRUMENT_WAIT, BACKEND_*,
 # *_CPUS) restart api and backend when they differ from the running values.
-# Keys for k6 (MODEL, VUS, RATE, DURATION, PRE_VUS, MAX_VUS, P95_MS, TIMEOUT)
+# Keys for k6 (MODEL, VUS, RATE, DURATION, PRE_VUS, MAX_VUS, TIMEOUT)
 # are passed to the script. K6_OUT=none disables the OpenTelemetry output.
 set -euo pipefail
 cd "$(dirname "$0")"
